@@ -1,0 +1,19 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Local / temporary files
+*.log
+*.tmp
+*.swp
+*.swo
+
+# Dependencies / build output
+node_modules/
+vendor/
+
+# Archives
+*.zip
+*.tar.gz
