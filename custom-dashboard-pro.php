@@ -197,10 +197,10 @@ function custom_theme_dashboard_content() {
                         </table>
                     </div>
                     <script>
-                        function ctApprovePost(id) { if(confirm('Publish?')) jQuery.post('<?php echo admin_url("admin-ajax.php"); ?>', { action: 'ct_frontend_publish_post', post_id: id }, function(res){ if(res.success) jQuery('#post-row-'+id).fadeOut(); }); }
-                        function ctTrashPost(id) { if(confirm('Trash?')) jQuery.post('<?php echo admin_url("admin-ajax.php"); ?>', { action: 'ct_frontend_trash_post', post_id: id }, function(res){ if(res.success) jQuery('#post-row-'+id).fadeOut(); }); }
-                        function ctApproveComment(id) { if(confirm('Approve?')) jQuery.post('<?php echo admin_url("admin-ajax.php"); ?>', { action: 'ct_approve_comment', comment_id: id }, function(res){ if(res.success) jQuery('#comment-row-'+id).fadeOut(); }); }
-                        function ctDeleteComment(id) { if(confirm('Delete?')) jQuery.post('<?php echo admin_url("admin-ajax.php"); ?>', { action: 'ct_delete_comment', comment_id: id }, function(res){ if(res.success) jQuery('#comment-row-'+id).fadeOut(); }); }
+                        function ctApprovePost(id) { if(confirm('Publish?')) jQuery.post('<?php echo admin_url("admin-ajax.php"); ?>', { action: 'ct_frontend_publish_post', post_id: id, security: ct_ajax_obj.nonce }, function(res){ if(res.success) jQuery('#post-row-'+id).fadeOut(); }); }
+                        function ctTrashPost(id) { if(confirm('Trash?')) jQuery.post('<?php echo admin_url("admin-ajax.php"); ?>', { action: 'ct_frontend_trash_post', post_id: id, security: ct_ajax_obj.nonce }, function(res){ if(res.success) jQuery('#post-row-'+id).fadeOut(); }); }
+                        function ctApproveComment(id) { if(confirm('Approve?')) jQuery.post('<?php echo admin_url("admin-ajax.php"); ?>', { action: 'ct_approve_comment', comment_id: id, security: ct_ajax_obj.nonce }, function(res){ if(res.success) jQuery('#comment-row-'+id).fadeOut(); }); }
+                        function ctDeleteComment(id) { if(confirm('Delete?')) jQuery.post('<?php echo admin_url("admin-ajax.php"); ?>', { action: 'ct_delete_comment', comment_id: id, security: ct_ajax_obj.nonce }, function(res){ if(res.success) jQuery('#comment-row-'+id).fadeOut(); }); }
                     </script>
                 <?php endif; ?>
 
