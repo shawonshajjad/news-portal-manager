@@ -72,7 +72,7 @@ jQuery(document).ready(function($){
     setInterval(function(){ if($('#ctNotifBell').length == 0) addBell(); }, 2000);
     
     function checkN(){ 
-        $.post(ct_ajax_obj.ajax_url, {action:'custom_get_notifs'}, function(r){ 
+        $.post(ct_ajax_obj.ajax_url, {action:'custom_get_notifs',security:ct_ajax_obj.nonce}, function(r){ 
             try {
                 var d = JSON.parse(r); 
                 $('#ctNotifList').html(d.html); 
@@ -83,7 +83,7 @@ jQuery(document).ready(function($){
     }
     
     checkN(); 
-    setInterval(checkN, 5000);
+    setInterval(checkN, 30000);
     
     $(document).on('click','#ctNotifBell',function(e){ 
         e.stopPropagation(); 
@@ -93,7 +93,7 @@ jQuery(document).ready(function($){
         d.css({'top':(o.top+50)+'px','left':(o.left-290)+'px'}); 
         d.fadeToggle(100); 
         if($('#ctNotifBadge').is(':visible')){ 
-            $.post(ct_ajax_obj.ajax_url, {action:'custom_mark_read'}, function(){ $('#ctNotifBadge').fadeOut(); }); 
+            $.post(ct_ajax_obj.ajax_url, {action:'custom_mark_read',security:ct_ajax_obj.nonce}, function(){ $('#ctNotifBadge').fadeOut(); }); 
         } 
     });
     
