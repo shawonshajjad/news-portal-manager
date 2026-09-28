@@ -380,17 +380,17 @@ function custom_theme_fetch_notifications() {
     echo json_encode(array('html' => $html, 'count' => $unread_count)); wp_die();
 }
 
-add_action('wp_ajax_custom_mark_read', function(){ if(is_user_logged_in()){ update_user_meta(get_current_user_id(), 'ct_notif_read_time', current_time('mysql')); } wp_die(); });
+add_action('wp_ajax_custom_mark_read', function(){ check_ajax_referer('custom_reg_nonce','security'); if(is_user_logged_in()){ update_user_meta(get_current_user_id(), 'ct_notif_read_time', current_time('mysql')); } wp_die(); });
 
 /**
  * ==============================================================================
  * PART 8 & 9: ACTIONS & ROLE
  * ==============================================================================
  */
-add_action('wp_ajax_ct_approve_comment', function(){ if(!current_user_can('moderate_comments')) wp_die(); wp_set_comment_status($_POST['comment_id'], 'approve'); update_comment_meta($_POST['comment_id'], '_custom_approval_time', current_time('mysql')); wp_send_json_success(); });
-add_action('wp_ajax_ct_delete_comment', function(){ if(!current_user_can('moderate_comments')) wp_die(); wp_delete_comment($_POST['comment_id'], true); wp_send_json_success(); });
-add_action('wp_ajax_ct_frontend_publish_post', function(){ if(!current_user_can('edit_others_posts')) wp_send_json_error(); wp_update_post(array('ID'=>intval($_POST['post_id']),'post_status'=>'publish')); wp_send_json_success(); });
-add_action('wp_ajax_ct_frontend_trash_post', function(){ if(!current_user_can('edit_others_posts')) wp_send_json_error(); wp_trash_post(intval($_POST['post_id'])); wp_send_json_success(); });
+add_action('wp_ajax_ct_approve_comment', function(){ check_ajax_referer('custom_reg_nonce','security'); if(!current_user_can('moderate_comments')) wp_die(); $id=isset($_POST['comment_id'])?absint($_POST['comment_id']):0; if(!$id) wp_send_json_error(); wp_set_comment_status($id,'approve'); update_comment_meta($id,'_custom_approval_time',current_time('mysql')); wp_send_json_success(); });
+add_action('wp_ajax_ct_delete_comment', function(){ check_ajax_referer('custom_reg_nonce','security'); if(!current_user_can('moderate_comments')) wp_die(); $id=isset($_POST['comment_id'])?absint($_POST['comment_id']):0; if(!$id) wp_send_json_error(); wp_delete_comment($id,true); wp_send_json_success(); });
+add_action('wp_ajax_ct_frontend_publish_post', function(){ check_ajax_referer('custom_reg_nonce','security'); $id=isset($_POST['post_id'])?absint($_POST['post_id']):0; if(!$id||!current_user_can('edit_post',$id)||!current_user_can('publish_posts')) wp_send_json_error(); wp_update_post(array('ID'=>$id,'post_status'=>'publish')); wp_send_json_success(); });
+add_action('wp_ajax_ct_frontend_trash_post', function(){ check_ajax_referer('custom_reg_nonce','security'); $id=isset($_POST['post_id'])?absint($_POST['post_id']):0; if(!$id||!current_user_can('delete_post',$id)) wp_send_json_error(); wp_trash_post($id); wp_send_json_success(); });
 
 add_action('init', function(){ if(!get_role('reporter')){ add_role('reporter','Reporter',array('read'=>true,'edit_posts'=>true,'upload_files'=>true)); } });
 add_action('admin_init', function(){ if(defined('DOING_AJAX'))return; $u=wp_get_current_user(); if(in_array('reporter',(array)$u->roles)&&!current_user_can('administrator')){ wp_redirect(home_url('/')); exit; } });
@@ -399,6 +399,7 @@ function custom_theme_handle_frontend_post() {
     if (isset($_POST['ct_submit_news']) && isset($_POST['ct_security'])) {
         if (!wp_verify_nonce($_POST['ct_security'], 'ct_reporter_post_nonce')) wp_die('Security fail');
         if (!is_user_logged_in()) wp_die('Login first');
+        if (!current_user_can('edit_posts')) wp_die('Forbidden');
         $post_data = array('post_title'=>sanitize_text_field($_POST['news_title']), 'post_content'=>wp_kses_post($_POST['news_content']), 'post_status'=>'pending', 'post_author'=>get_current_user_id(), 'post_category'=>array(intval($_POST['news_cat'])));
         $pid = wp_insert_post($post_data);
         if ($pid) {
